@@ -7,7 +7,7 @@ How to run the test suite.
 - Docker (with the `compose` subcommand)
 - `jq`, `curl`, `bash`, `git`
 - A local clone of [percona/pmm](https://github.com/percona/pmm) on the
-  `v3` branch
+  `PMM-14985-add-promdb-telemetry` branch
 - Internet access on first run (to pull `percona/pmm-server:3` and
   `prom/prometheus:latest`)
 
