@@ -1,0 +1,15 @@
+---
+# Override compose file. Layer on top of your PMM stack to enable promdb
+# and mount the pre-generated TSDB blocks. Service name must match your
+# base compose (defaults to `pmm-server`).
+#
+# Usage:
+#   docker compose -f /path/to/your/pmm-compose.yml \
+#                  -f docker-compose.promdb.yml up -d
+
+services:
+  pmm-server:
+    environment:
+      - VM_prometheusDataPath=/srv/prometheus/data
+    volumes:
+      - ./blocks:/srv/prometheus/data
