@@ -3,11 +3,9 @@
 # and mount the pre-generated TSDB blocks. Service name must match your
 # base compose (defaults to `pmm-server`).
 #
-# Run from this directory so ${PWD} resolves to the blocks/ alongside this
-# file (avoids project-directory conflicts with the base compose's own
-# relative paths):
+# Run from this directory so ${PWD} resolves to the blocks/ alongside this file:
 #   docker compose -f /path/to/your/pmm-compose.yml \
-#                  -f docker-compose.promdb.yml up -d
+#                  -f docker-compose.promdb.yml --profile pmm up -d
 
 services:
   pmm-server:
