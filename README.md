@@ -7,7 +7,9 @@ Bring up your own PMM (must include the new telemetry config from
 
 ### 1. Wire promdb into your PMM stack
 
-Layer `docker-compose.promdb.yml` on top of your existing PMM compose file:
+Layer `docker-compose.promdb.yml` on top of your existing PMM compose file.
+Run this from the current directory so `${PWD}/blocks` in the override
+resolves to the TSDB blocks shipped alongside this file:
 
 ```sh
 docker compose -f /path/to/your/pmm-compose.yml \
@@ -21,16 +23,16 @@ service and bind-mounts `./blocks` into that path.
 
 `https://<your-pmm>:8443` and log in.
 
-### 3. Confirm the synthetic data is queryable
+### 3. Confirm the Prometheus-native data is queryable
 
-**Explore → Metrics datasource**, time range **Last 8 hours**, run:
+In UI, **Explore → Metrics datasource**, time range **Last 8 hours**, run:
 
 ```promql
-up{job="qa_promdb_synthetic"}
+up
 ```
 
-You should see 7 data points (one per hour over the last 6 hours). Re-run a
-few times over ~1 minute so VM's self-scrape captures multiple samples.
+You should see many `up` series. Among them is `up{job="qa_promdb_synthetic", instance="qa"}` with hourly samples
+across the last 6 hours: that's the Prometheus-native series read out of promdb.
 
 ### 4. Check the new telemetry counter
 
@@ -42,7 +44,7 @@ vm_promdb_series_read_per_query_count
 
 Expected: a positive value, increasing as you re-run step 3.
 
-### 5. (Optional) Watch the reported average
+### 5. Watch the reported average
 
 ```promql
 sum(rate(vm_promdb_series_read_per_query_sum[5m]))
@@ -50,7 +52,7 @@ sum(rate(vm_promdb_series_read_per_query_sum[5m]))
 ```
 
 This is the same expression PMM ships as `vm_promdb_series_read_per_query_avg`
-in the telemetry payload.
+in the telemetry payload. We expect it to be non-zero value after querying `up`, this confirms that new telemetry is working as intended. 
 
 ---
 
@@ -63,7 +65,7 @@ this directory:
 rm -rf blocks && mkdir blocks
 NOW=$(date +%s)
 {
-  echo '# HELP up synthetic'
+  echo '# HELP up Prometheus-native sample planted under VM'\''s -prometheusDataPath'
   echo '# TYPE up gauge'
   for i in 6 5 4 3 2 1 0; do
     echo "up{job=\"qa_promdb_synthetic\",instance=\"qa\"} 1 $((NOW - i*3600)).000"
